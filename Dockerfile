@@ -44,7 +44,6 @@ RUN set -x && \
   rm -rf /var/lib/apt/lists/*
 
 
-/*
 ARG CMAKE_INSTALL_PREFIX=/usr/local
 ARG NUM_THREADS=1
 
@@ -54,9 +53,8 @@ ENV CPLUS_INCLUDE_PATH=${CMAKE_INSTALL_PREFIX}/include:${CPLUS_INCLUDE_PATH}
 ENV LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LIBRARY_PATH}
 ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
-ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
-ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
-*/
+# ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
+# ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 
 # Eigen                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
@@ -206,72 +204,6 @@ RUN set -x && \
 ENV Pangolin_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
 
 
-# ROS-Melodic                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-ENV DEBIAN_FRONTEND="noninteractive" \
-    TERM="xterm"
-
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-
-# Variables for ROS distribution, configuration, and relevant directories                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
-ARG ROS_DISTRO="melodic"
-ARG ROS_CONFIG="ros_base"
-ENV CATKIN_WS="/usr/catkin_ws" \
-    ROS_INSTALL_DIR="/opt/ros/$ROS_DISTRO"
-
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-  build-essential \
-  python-pip
-
-# Install ROS-related Python tools                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt && rm requirements.txt
-
-RUN rosdep init \
-    && rosdep update
-
-RUN mkdir -p $CATKIN_WS/src $ROS_INSTALL_DIR
-
-WORKDIR $CATKIN_WS
-
-RUN rosinstall_generator $ROS_CONFIG --rosdistro $ROS_DISTRO \
-    --deps --tar > .rosinstall \
-    && wstool init src .rosinstall \
-    && rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y \
-       --skip-keys python-rosdep \
-       --skip-keys python-rospkg \
-       --skip-keys python-catkin-pkg \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN catkin init \
-    && catkin config --install --install-space $ROS_INSTALL_DIR \
-       --cmake-args -DCMAKE_BUILD_TYPE=Release \
-    && catkin build --no-status --no-summary --no-notify \
-    && catkin clean -y --logs --build --devel
-
-WORKDIR /usr
-
-RUN rm -rf $CATKIN_WS
-
-COPY ./ros_entrypoint.sh .
-
-ENTRYPOINT ["bash", "ros_entrypoint.sh"]
-
-CMD ["bash"]
-
-
-
-
-
-
-ARG LSB_RELEASE=bionic
-RUN set -x && \
-  sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list' \
-  apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 \
-  curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | sudo apt-key add - \
-  apt install ros-melodic-desktop-full \
-
-
 # ORB-SLAM3                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
 COPY . /ORB-SLAM3/
 WORKDIR /ORB-SLAM3/
@@ -300,5 +232,5 @@ RUN set -x && \
   rm -rf CMakeCache.txt CMakeFiles Makefile cmake_install.cmake example src && \
   chmod -R 777 ./*
 
-WORKDIR /openvslam/build/
+WORKDIR /ORB-SLAM3/build/
 ENTRYPOINT ["/bin/bash"]
