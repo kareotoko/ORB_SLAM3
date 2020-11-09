@@ -79,43 +79,43 @@ src/KeyFrameDatabase.cc
 src/Sim3Solver.cc
 src/Initializer.cc
 src/Viewer.cc
-src/ImuTypes.cc # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya.
+src/ImuTypes.cc # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya. 
 src/G2oTypes.cc # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya.
 src/CameraModels/Pinhole.cpp # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya.
 src/CameraModels/KannalaBrandt8.cpp # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya.
 src/OptimizableTypes.cpp # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya.
 src/MLPnPsolver.cpp # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/System.h
-include/Tracking.h
-include/LocalMapping.h
-include/LoopClosing.h
-include/ORBextractor.h
-include/ORBmatcher.h
-include/FrameDrawer.h
-include/Converter.h
-include/MapPoint.h
-include/KeyFrame.h
-include/Atlas.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/Map.h
-include/MapDrawer.h
-include/Optimizer.h
-include/PnPsolver.h
-include/Frame.h
-include/KeyFrameDatabase.h
-include/Sim3Solver.h
-include/Initializer.h
-include/Viewer.h
-include/ImuTypes.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/G2oTypes.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/CameraModels/GeometricCamera.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/CameraModels/Pinhole.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/CameraModels/KannalaBrandt8.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/OptimizableTypes.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/MLPnPsolver.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-include/TwoViewReconstruction.h # ??ini-header pada ORB-SLAM2 itu tidak ada mengapa ya.
-src/TwoViewReconstruction.cc) # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya.
+include/System.h # Dep.: <unistd.h> <stdio.h> <stdlib.h> <string> <thread> <opencv2/core/core.hpp> "Tracking.h" "FrameDrawer.h" "MapDrawer.h" "Atlas.h" "LocalMapping.h" "LoopClosing.h" "KeyFrameDatabase.h" "ORBVocabulary.h" "Viewer.h" "ImuTypes.h"
+include/Tracking.h # Dep.: <opencv2/core/core.hpp> <opencv2/features2d/features2d.hpp> <opencv2/video/tracking.hpp> <mutex> <unordered_set> "Viewer.h" "FrameDrawer.h" "Atlas.h" "LocalMapping.h" "LoopClosing.h" "Frame.h" "ORBVocabulary.h" "KeyFrameDatabase.h" "ORBextractor.h" "Initializer.h" "MapDrawer.h" "System.h" "ImuTypes.h" "GeometricCamera.h" 
+include/LocalMapping.h # Dep.: <mutex> "KeyFrame.h" "Atlas.h" "LoopClosing.h" "Tracking.h" "KeyFrameDatabase.h" "Initializer.h" 
+include/LoopClosing.h # Dep.: <boost/algorithm/string.hpp> <thread> <mutex> "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h"
+include/ORBextractor.h # Dep.: <vector> <list> <opencv/cv.h>
+include/ORBmatcher.h # Dep.: <vector> <opencv2/core/core.hpp> <opencv2/features2d/features2d.hpp> "MapPoint.h" "KeyFrame.h" "Frame.h"
+include/FrameDrawer.h # Dep.: <opencv2/core/core.hpp> <opencv2/features2d/features2d.hpp> <mutex> <unordered_set> "Tracking.h" "MapPoint.h" "Atlas.h"
+include/Converter.h # Dep.: <opencv2/core/core.hpp> <Eigen/Dense> "Thirdparty/g2o/g2o/types/types_six_dof_expmap.h" "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h" 
+include/MapPoint.h # Dep.: <opencv2/core/core.hpp> <mutex> <boost/serialization/serialization.hpp> <boost/serialization/array.hpp> <boost/serialization/map.hpp> "KeyFrame.h" "Frame.h" "Map.h"
+include/KeyFrame.h # Dep.: <mutex> <boost/serialization/base_object.hpp> <boost/serialization/vector.hpp> <boost/serialization/map.hpp> "MapPoint.h" "Thirdparty/DBoW2/DBoW2/BowVector.h" "Thirdparty/DBoW2/DBoW2/FeatureVector.h" "ORBVocabulary.h" "ORBextractor.h" "Frame.h" "KeyFrameDatabase.h" "ImuTypes.h" "GeometricCamera.h"
+include/Atlas.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <set> <mutex> <boost/serialization/vector.hpp> <boost/serialization/export.hpp> "Map.h" "MapPoint.h" "KeyFrame.h" "GeometricCamera.h" "Pinhole.h" "KannalaBrandt8.h" 
+include/Map.h # Dep.: <set> <pangolin/pangolin.h> <mutex> <boost/serialization/base_object.hpp> "MapPoint.h" "KeyFrame.h" 
+include/MapDrawer.h # Dep.: <pangolin/pangolin.h> <mutex> "Atlas.h" "MapPoint.h" "KeyFrame.h" 
+include/Optimizer.h # Dep.: <math.h> "Map.h" "MapPoint.h" "KeyFrame.h" "LoopClosing.h" "Frame.h" "Thirdparty/g2o/g2o/types/types_seven_dof_expmap.h" "Thirdparty/g2o/g2o/core/sparse_block_matrix.h" "Thirdparty/g2o/g2o/core/block_solver.h" "Thirdparty/g2o/g2o/core/optimization_algorithm_levenberg.h" "Thirdparty/g2o/g2o/core/optimization_algorithm_gauss_newton.h" "Thirdparty/g2o/g2o/solvers/linear_solver_eigen.h" "Thirdparty/g2o/g2o/types/types_six_dof_expmap.h" "Thirdparty/g2o/g2o/core/robust_kernel_impl.h" "Thirdparty/g2o/g2o/solvers/linear_solver_dense.h"
+include/PnPsolver.h # Dep.: <opencv2/core/core.hpp> "MapPoint.h" "Frame.h"
+include/Frame.h # Dep.: <vector> <mutex> <opencv2/opencv.hpp> "Thirdparty/DBoW2/DBoW2/BowVector.h" "Thirdparty/DBoW2/DBoW2/FeatureVector.h" "ImuTypes.h" "ORBVocabulary.h"
+include/KeyFrameDatabase.h # Dep.: <vector> <list> <set> <boost/serialization/base_object.hpp> <boost/serialization/vector.hpp> <boost/serialization/list.hpp> <mutex> "KeyFrame.h" "Frame.h" "ORBVocabulary.h" "Map.h"
+include/Sim3Solver.h # Dep.: <opencv2/opencv.hpp> <vector> "KeyFrame.h"
+include/Initializer.h # Dep.: <opencv2/opencv.hpp> <unordered_set> "Frame.h"
+include/Viewer.h # Dep.: <mutex> "FrameDrawer.h" "MapDrawer.h" "Tracking.h" "System.h"
+include/ImuTypes.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <vector> <utility> <opencv2/core/core.hpp> <Eigen/Core> <Eigen/Geometry> <Eigen/Dense> <mutex> <boost/serialization/serialization.hpp> <boost/serialization/vector.hpp>
+include/G2oTypes.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <opencv2/core/core.hpp> <Eigen/Core> <Eigen/Geometry> <Eigen/Dense> <Frame.h> <KeyFrame.h> <math.h> "Converter.h" "Thirdparty/g2o/g2o/core/base_vertex.h" "Thirdparty/g2o/g2o/core/base_binary_edge.h" "Thirdparty/g2o/g2o/types/types_sba.h" "Thirdparty/g2o/g2o/core/base_multi_edge.h" "Thirdparty/g2o/g2o/core/base_unary_edge.h"
+include/CameraModels/GeometricCamera.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <opencv2/core/core.hpp> <opencv2/imgproc/imgproc.hpp> <opencv2/features2d/features2d.hpp> <boost/serialization/serialization.hpp> <boost/serialization/access.hpp> <boost/serialization/base_object.hpp> <boost/serialization/export.hpp> <boost/serialization/vector.hpp> <boost/serialization/assume_abstract.hpp> <Eigen/Geometry>
+include/CameraModels/Pinhole.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <assert.h> <vector> <opencv2/core/core.hpp> <boost/serialization/serialization.hpp> <boost/serialization/base_object.hpp> <boost/serialization/vector.hpp> <boost/serialization/assume_abstract.hpp> "GeometricCamera.h" "TwoViewReconstruction.h"
+include/CameraModels/KannalaBrandt8.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <assert.h> <vector> <opencv2/core/core.hpp> <boost/serialization/serialization.hpp> <boost/serialization/base_object.hpp> <boost/serialization/vector.hpp> "GeometricCamera.h" "TwoViewReconstruction.h"
+include/OptimizableTypes.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <Eigen/Geometry> <include/CameraModels/GeometricCamera.h> <Thirdparty/g2o/g2o/types/types_six_dof_expmap.h> <Thirdparty/g2o/g2o/types/sim3.h> "Thirdparty/g2o/g2o/core/base_unary_edge.h"
+include/MLPnPsolver.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <Eigen/Dense> <Eigen/Sparse> "MapPoint.h" "Frame.h" 
+include/TwoViewReconstruction.h # ??ini-header pada ORB-SLAM2 itu tidak ada | Dep.: <opencv2/opencv.hpp> <unordered_set> 
+src/TwoViewReconstruction.cc) # ??ini pada ORB-SLAM2 itu tidak ada 
 
-add_subdirectory(Thirdparty/g2o) # ??ini pada ORB-SLAM2 itu tidak ada mengapa ya. | Thirdparty/g2o baiknya dibangun dari sumber aslinya atau lewat ORB-SLAM3
+add_subdirectory(Thirdparty/g2o) 
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
