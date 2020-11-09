@@ -16,18 +16,18 @@
 * If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ImuTypes.h"
+#include "ImuTypes.h" //## Ini berfungsi memanggil header ImuTypes.h yang berada di folder `include`
 #include<iostream>
 
-namespace ORB_SLAM3
+namespace ORB_SLAM3 //## Namespace ORB_SLAM3 digunakan agar tidak ada konflik apabila ada class dengan nama yang sama pada folder lain
 {
 
-namespace IMU
+namespace IMU //## Namespace IMU fungsinya setali tiga uang dengan yang di atas
 {
 
-const float eps = 1e-4;
+const float eps = 1e-4; //## `const` digunakan agar nilai `eps` dengan tipe `float` tidak berubah
 
-cv::Mat NormalizeRotation(const cv::Mat &R)
+cv::Mat NormalizeRotation(const cv::Mat &R) //# ??cv::Mat NormalizeRotation adalah fungsi opencv yang digunakan untuk ... | !!Silahkan cari sendiri 
 {
     cv::Mat U,w,Vt;
     cv::SVDecomp(R,w,U,Vt,cv::SVD::FULL_UV);
@@ -35,7 +35,7 @@ cv::Mat NormalizeRotation(const cv::Mat &R)
     return U*Vt;
 }
 
-cv::Mat Skew(const cv::Mat &v)
+cv::Mat Skew(const cv::Mat &v) //# ??cv::Mat Skew adalah fungsi opencv yang digunakan untuk ... | !!Silahkan cari sendiri 
 {
     const float x = v.at<float>(0);
     const float y = v.at<float>(1);
@@ -45,7 +45,7 @@ cv::Mat Skew(const cv::Mat &v)
             -y,  x, 0);
 }
 
-cv::Mat ExpSO3(const float &x, const float &y, const float &z)
+cv::Mat ExpSO3(const float &x, const float &y, const float &z) //# ??cv::Mat ExpSO3 adalah fungsi opencv yang digunakan untuk ... 
 {
     cv::Mat I = cv::Mat::eye(3,3,CV_32F);
     const float d2 = x*x+y*y+z*z;
@@ -59,7 +59,7 @@ cv::Mat ExpSO3(const float &x, const float &y, const float &z)
         return (I + W*sin(d)/d + W*W*(1.0f-cos(d))/d2);
 }
 
-Eigen::Matrix<double,3,3> ExpSO3(const double &x, const double &y, const double &z)
+Eigen::Matrix<double,3,3> ExpSO3(const double &x, const double &y, const double &z) //# ??Eigen::Matrix adalah fungsi Eigen yang digunakan untuk ... 
 {
     Eigen::Matrix<double,3,3> I = Eigen::MatrixXd::Identity(3,3);
     const double d2 = x*x+y*y+z*z;
@@ -81,12 +81,12 @@ Eigen::Matrix<double,3,3> ExpSO3(const double &x, const double &y, const double 
         return (I + W*sin(d)/d + W*W*(1.0-cos(d))/d2);
 }
 
-cv::Mat ExpSO3(const cv::Mat &v)
+cv::Mat ExpSO3(const cv::Mat &v) //# ??cv::Mat ExpSO3 adalah fungsi opencv yang digunakan untuk ...
 {
     return ExpSO3(v.at<float>(0),v.at<float>(1),v.at<float>(2));
 }
 
-cv::Mat LogSO3(const cv::Mat &R)
+cv::Mat LogSO3(const cv::Mat &R) //# ??cv::Mat LogSO3 adalah fungsi opencv yang digunakan untuk ...
 {
     const float tr = R.at<float>(0,0)+R.at<float>(1,1)+R.at<float>(2,2);
     cv::Mat w = (cv::Mat_<float>(3,1) <<(R.at<float>(2,1)-R.at<float>(1,2))/2,
@@ -103,7 +103,7 @@ cv::Mat LogSO3(const cv::Mat &R)
         return theta*w/s;
 }
 
-cv::Mat RightJacobianSO3(const float &x, const float &y, const float &z)
+cv::Mat RightJacobianSO3(const float &x, const float &y, const float &z) //# ??cv::Mat RightJacobianSO3 adalah fungsi opencv yang digunakan untuk ...
 {
     cv::Mat I = cv::Mat::eye(3,3,CV_32F);
     const float d2 = x*x+y*y+z*z;
@@ -121,12 +121,12 @@ cv::Mat RightJacobianSO3(const float &x, const float &y, const float &z)
     }
 }
 
-cv::Mat RightJacobianSO3(const cv::Mat &v)
+cv::Mat RightJacobianSO3(const cv::Mat &v) //# ??cv::Mat RightJacobianSO3 adalah fungsi opencv yang digunakan untuk ...
 {
     return RightJacobianSO3(v.at<float>(0),v.at<float>(1),v.at<float>(2));
 }
 
-cv::Mat InverseRightJacobianSO3(const float &x, const float &y, const float &z)
+cv::Mat InverseRightJacobianSO3(const float &x, const float &y, const float &z) //# ??cv::Mat InverseRightJacobianSO3 adalah fungsi opencv yang digunakan untuk ...
 {
     cv::Mat I = cv::Mat::eye(3,3,CV_32F);
     const float d2 = x*x+y*y+z*z;
@@ -144,14 +144,14 @@ cv::Mat InverseRightJacobianSO3(const float &x, const float &y, const float &z)
     }
 }
 
-cv::Mat InverseRightJacobianSO3(const cv::Mat &v)
+cv::Mat InverseRightJacobianSO3(const cv::Mat &v) //# ??cv::Mat InverseRightJacobianSO3 adalah fungsi opencv yang digunakan untuk ...
 {
     return InverseRightJacobianSO3(v.at<float>(0),v.at<float>(1),v.at<float>(2));
 }
 
 
 IntegratedRotation::IntegratedRotation(const cv::Point3f &angVel, const Bias &imuBias, const float &time):
-    deltaT(time)
+    deltaT(time) //# ??IntegratedRotation::IntegratedRotation adalah fungsi apa ya ...
 {
     const float x = (angVel.x-imuBias.bwx)*time;
     const float y = (angVel.y-imuBias.bwy)*time;
@@ -177,7 +177,7 @@ IntegratedRotation::IntegratedRotation(const cv::Point3f &angVel, const Bias &im
     }
 }
 
-Preintegrated::Preintegrated(const Bias &b_, const Calib &calib)
+Preintegrated::Preintegrated(const Bias &b_, const Calib &calib) //#
 {
     Nga = calib.Cov.clone();
     NgaWalk = calib.CovWalk.clone();
