@@ -37,19 +37,19 @@ namespace ORB_SLAM3
 namespace IMU
 {
 
-const float GRAVITY_VALUE=9.81;
+const float GRAVITY_VALUE=9.81; //## `const` dari GRAVITY_VALUE dengan tipe data `float` adalah konstan 9.81
 
 //IMU measurement (gyro, accelerometer and timestamp)
 class Point
 {
-public:
-    Point(const float &acc_x, const float &acc_y, const float &acc_z,
-             const float &ang_vel_x, const float &ang_vel_y, const float &ang_vel_z,
-             const double &timestamp): a(acc_x,acc_y,acc_z), w(ang_vel_x,ang_vel_y,ang_vel_z), t(timestamp){}
-    Point(const cv::Point3f Acc, const cv::Point3f Gyro, const double &timestamp):
+public: //## Point pertama di bawah adalah format data pengukuran sedangkan yang kedua adalah format yang digunakan dalam aplikasi ini
+    Point(const float &acc_x, const float &acc_y, const float &acc_z, //##  Point(a,b,c,f,g,h,t):x(a,b,c),y(f,g,h),z(t){}
+             const float &ang_vel_x, const float &ang_vel_y, const float &ang_vel_z, //## acc adalah accelerometer sedangkan ang_vell adalah gyroscope
+             const double &timestamp): a(acc_x,acc_y,acc_z), w(ang_vel_x,ang_vel_y,ang_vel_z), t(timestamp){} 
+    Point(const cv::Point3f Acc, const cv::Point3f Gyro, const double &timestamp): //## cv::Point3f lihat penjelasan di bawah
         a(Acc.x,Acc.y,Acc.z), w(Gyro.x,Gyro.y,Gyro.z), t(timestamp){}
 public:
-    cv::Point3f a;
+    cv::Point3f a; //# Please see Point3f explanation here https://answers.opencv.org/question/196492/what-is-point2f-and-point3f/
     cv::Point3f w;
     double t;
 };
@@ -57,8 +57,8 @@ public:
 //IMU biases (gyro and accelerometer)
 class Bias
 {
-    friend class boost::serialization::access;
-    template<class Archive>
+    friend class boost::serialization::access; //## friend adalah tipe class atau function khusus, lihat https://www.geeksforgeeks.org/friend-class-function-cpp/
+    template<class Archive>  //## template tool yang sangat powerful yang dapat memasukan tipe data sebagai parameter, https://www.geeksforgeeks.org/templates-cpp/
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & bax;
