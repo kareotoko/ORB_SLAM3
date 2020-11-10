@@ -31,6 +31,10 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/vector.hpp>
 
+// Beberapa kelas dalam ImuTypes ini antara lain
+// class Point
+
+
 namespace ORB_SLAM3
 {
 
@@ -52,36 +56,36 @@ public:
     cv::Point3f a; //# Please see Point3f explanation here https://answers.opencv.org/question/196492/what-is-point2f-and-point3f/
     cv::Point3f w;
     double t;
-};
+}; //class Point is closed
 
 //IMU biases (gyro and accelerometer)
 class Bias
 {
     friend class boost::serialization::access; //## friend adalah tipe class atau function khusus, lihat https://www.geeksforgeeks.org/friend-class-function-cpp/
     template<class Archive>  //## template tool yang sangat powerful yang dapat memasukan tipe data sebagai parameter, https://www.geeksforgeeks.org/templates-cpp/
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & bax;
+    void serialize(Archive & ar, const unsigned int version) //## unsigned -> could only store positive value, https://www.learncpp.com/cpp-tutorial/unsigned-integers-and-why-to-avoid-them/
+    { //## serialize adalah mekanisme untuk mengkonvert objek menjadi serial byte, https://www.codeguru.com/cpp/cpp/algorithms/general/an-introduction-to-object-serialization-in-c.html
+        ar & bax; //# ar apa ya | bax itu adalah accelerometer pada arah x
         ar & bay;
         ar & baz;
 
         ar & bwx;
         ar & bwy;
         ar & bwz;
-    }
+    } // void serialize is closed
 
 public:
     Bias():bax(0),bay(0),baz(0),bwx(0),bwy(0),bwz(0){}
-    Bias(const float &b_acc_x, const float &b_acc_y, const float &b_acc_z,
-            const float &b_ang_vel_x, const float &b_ang_vel_y, const float &b_ang_vel_z):
-            bax(b_acc_x), bay(b_acc_y), baz(b_acc_z), bwx(b_ang_vel_x), bwy(b_ang_vel_y), bwz(b_ang_vel_z){}
+    Bias(const float &b_acc_x, const float &b_acc_y, const float &b_acc_z, //hampir sama fungsinya sama dengan class Point di atas, hanya tanpa timestamp karena gak ada bias untuk waktu
+            const float &b_ang_vel_x, const float &b_ang_vel_y, const float &b_ang_vel_z): // const float dari posisi pointer &b_ang_vel_x dan seterusnya
+            bax(b_acc_x), bay(b_acc_y), baz(b_acc_z), bwx(b_ang_vel_x), bwy(b_ang_vel_y), bwz(b_ang_vel_z){} 
     void CopyFrom(Bias &b);
-    friend std::ostream& operator<< (std::ostream &out, const Bias &b);
+    friend std::ostream& operator<< (std::ostream &out, const Bias &b); // inget fungsi friend di atas yang bisa mengakses class private
 
 public:
     float bax, bay, baz;
     float bwx, bwy, bwz;
-};
+}; // class Bias is closed
 
 //IMU calibration (Tbc, Tcb, noise)
 class Calib
@@ -109,8 +113,8 @@ class Calib
             for (int i = 0; i < rows; i++) {
                 ar & boost::serialization::make_array(mat.ptr(i), row_size);
             }
-        }
-    }
+        } 
+    } // void serializeMatrix is closed
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -120,7 +124,7 @@ class Calib
         serializeMatrix(ar,Tbc,version);
         serializeMatrix(ar,Cov,version);
         serializeMatrix(ar,CovWalk,version);
-    }
+    } // void serialize is closed
 
 public:
     Calib(const cv::Mat &Tbc_, const float &ng, const float &na, const float &ngw, const float &naw)
@@ -136,7 +140,7 @@ public:
     cv::Mat Tcb;
     cv::Mat Tbc;
     cv::Mat Cov, CovWalk;
-};
+}; //class Calib is closed
 
 //Integration of 1 gyro measurement
 class IntegratedRotation
@@ -149,7 +153,7 @@ public:
     float deltaT; //integration time
     cv::Mat deltaR; //integrated rotation
     cv::Mat rightJ; // right jacobian
-};
+}; //class IntegratedRotation is closed
 
 //Preintegration of Imu Measurements
 class Preintegrated
@@ -178,7 +182,7 @@ class Preintegrated
                 ar & boost::serialization::make_array(mat.ptr(i), row_size);
             }
         }
-    }
+    } // void serializeMatrix is closed
 
     friend class boost::serialization::access;
     template<class Archive>
@@ -204,7 +208,7 @@ class Preintegrated
         ar & bu;
         serializeMatrix(ar,db,version);
         ar & mvMeasurements;
-    }
+    } // void serialize is closed
 
 public:
     Preintegrated(const Bias &b_, const Calib &calib);
@@ -264,7 +268,7 @@ private:
     std::vector<integrable> mvMeasurements;
 
     std::mutex mMutex;
-};
+}; //class Preintegrated is closed
 
 // Lie Algebra Functions
 cv::Mat ExpSO3(const float &x, const float &y, const float &z);
@@ -278,8 +282,8 @@ cv::Mat InverseRightJacobianSO3(const cv::Mat &v);
 cv::Mat Skew(const cv::Mat &v);
 cv::Mat NormalizeRotation(const cv::Mat &R);
 
-}
+} //namespace IMU is closed
 
-} //namespace ORB_SLAM2
+} //namespace ORB_SLAM2 is closed
 
 #endif // IMUTYPES_H
