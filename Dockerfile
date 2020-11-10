@@ -7,7 +7,8 @@ ENV DEBCONF_NOWARNINGS yes
 RUN set -x && \
   apt-get update -y -qq && \
   apt-get upgrade -y -qq --no-install-recommends && \
-  : “basic dependencies” && \ ## di bawah ini dependencies nya
+  : “basic dependencies” && \ 
+  ## di bawah ini dependencies nya
   apt-get install -y -qq \
     build-essential \
     pkg-config \
@@ -24,13 +25,15 @@ RUN set -x && \
     mesa-utils \
     libpython2.7-dev \
     unzip && \
-  : “g2o dependencies” && \ ## di bawah ini dependencies nya
+  : “g2o dependencies” && \ 
+  ## di bawah ini dependencies nya
   apt-get install -y -qq \
     libgoogle-glog-dev \
     libatlas-base-dev \
     libsuitesparse-dev \
     libglew-dev && \
-  : “OpenCV dependencies” && \ ## di bawah ini dependencies nya
+  : “OpenCV dependencies” && \ 
+  ## di bawah ini dependencies nya
   apt-get install -y -qq \
     libgtk-3-dev \
     libjpeg-dev \
@@ -44,12 +47,15 @@ RUN set -x && \
     libavutil-dev \
     libswscale-dev \
     libavresample-dev && \
-  : “other dependencies” && \ ## di bawah ini dependencies nya
+  : “other dependencies” && \ 
+  ## di bawah ini dependencies nya
   apt-get install -y -qq \
     libyaml-cpp-dev && \
   : “remove cache” && \
-  apt-get autoremove -y -qq && \ ##autoremove will remove those dependencies that were installed with applications and that are no longer used by anything else on the system | https://askubuntu.com/questions/527410/what-is-the-advantage-of-using-sudo-apt-get-autoremove-over-a-cleaner-app
-  rm -rf /var/lib/apt/lists/*    ##menghapus file cache dependencies yang sudah tidak digunakan lagi
+  apt-get autoremove -y -qq && \ 
+  ##autoremove will remove those dependencies that were installed with applications and that are no longer used by anything else on the system | https://askubuntu.com/questions/527410/what-is-the-advantage-of-using-sudo-apt-get-autoremove-over-a-cleaner-app
+  rm -rf /var/lib/apt/lists/*    
+  ##menghapus file cache dependencies yang sudah tidak digunakan lagi
 
 
 ARG CMAKE_INSTALL_PREFIX=/usr/local
@@ -67,7 +73,8 @@ ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
 #Eigen
 ARG EIGEN3_VERSION=3.3.8
-WORKDIR /tmp #Dependencies seperti Eigein, OpenCV, dan Pangolin membuat working directory di
+WORKDIR /tmp 
+#Dependencies seperti Eigein, OpenCV, dan Pangolin membuat working directory di /temporary
 RUN set -x && \
   wget -q https://gitlab.com/libeigen/eigen/-/archive/${EIGEN3_VERSION}/eigen-${EIGEN3_VERSION}.tar.bz2 && \
   tar xf eigen-${EIGEN3_VERSION}.tar.bz2 && \
@@ -77,13 +84,18 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \ ##to set the configuration type
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ ##ini adalah lokasi menginstall Eigen di /usr/local
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
+    ##ini adalah lokasi menginstall Eigen di /usr/local
     .. && \
-  make -j${NUM_THREADS} && \ #default make -j1 tetapi bisa dipercepat di saat awal menginstall
-  make install && \ ##perintah untuk menginstall make
+  make -j${NUM_THREADS} && \ 
+  #default make -j1 tetapi bisa dipercepat di saat awal menginstall
+  make install && \ 
+  ##perintah untuk menginstall make
   cd /tmp && \
-  rm -rf * ##// setelah berhasil membangun Eigen lalu folder temporary tersebut didelete
-ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake ##//lokasi instalasi Eigen di /usr/local
+  rm -rf * 
+  ##// setelah berhasil membangun Eigen lalu folder temporary tersebut didelete
+ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake 
+##//lokasi instalasi Eigen di /usr/local
 
 
 #OpenCV
@@ -98,7 +110,8 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ ##//ini adalah lokasi menginstall OpenCV di /usr/local
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
+    ##//ini adalah lokasi menginstall OpenCV di /usr/local
     -DENABLE_CXX11=ON \
     -DENABLE_FAST_MATH=ON \
     -DWITH_EIGEN=ON \
@@ -107,13 +120,17 @@ RUN set -x && \
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
-  cd /tmp && \ ##//lokasi penyinpanan sementar file yang tidak ada hubungannya dengan Cmake didelete
-  rm -rf * ##// setelah berhasil membangun Eigen lalu folder temporary tersebut didelete
-ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv4 ##//lokasi instalasi Opencv di /usr/local
+  cd /tmp && \ 
+  ##//lokasi penyinpanan sementar file yang tidak ada hubungannya dengan Cmake didelete
+  rm -rf * 
+  ##// setelah berhasil membangun Eigen lalu folder temporary tersebut didelete
+ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv4 
+##//lokasi instalasi Opencv di /usr/local
 
 
 #Pangolin
-ARG PANGOLIN_COMMIT=ad8b5f83222291c51b4800d5a5873b0e90a0cf81 ##// sepertinya ini adalah versi pangolin yang berfungsi pada openvslam tetapi apakah juga berfungsi pada orb-slam3??
+ARG PANGOLIN_COMMIT=ad8b5f83222291c51b4800d5a5873b0e90a0cf81 
+##// sepertinya ini adalah versi pangolin yang berfungsi pada openvslam tetapi apakah juga berfungsi pada orb-slam3??
 WORKDIR /tmp
 RUN set -x && \
   git clone https://github.com/stevenlovegrove/Pangolin.git && \
@@ -124,7 +141,8 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ ##//ini adalah lokasi menginstall OpenCV di /usr/local
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
+    ##//ini adalah lokasi menginstall OpenCV di /usr/local
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
@@ -143,38 +161,38 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ ##//ini adalah lokasi menginstall DBoW2 di /usr/local
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
+    ##//ini adalah lokasi menginstall DBoW2 di /usr/local
     .. && \
   make -j${NUM_THREADS} && \
   echo "...DBoW2 is built..." && \
   echo "--------------------" && \
-  
   cd ../../g2o  && \
   echo "...Configuring and building Thirdparty/g2o..." && \
   mkdir build && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ ##//ini adalah lokasi menginstall g2o di /usr/local
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
+    ##//ini adalah lokasi menginstall g2o di /usr/local
     .. && \
   make -j${NUM_THREADS} && \
   echo "...g2o is built..." && \
   echo "--------------------" && \
-  
-  cd ../../../ && \
+  cd ../../.. && \
   echo "...Uncompress vocabulary..." && \
   cd Vocabulary && \
   tar -xf ORBvoc.txt.tar.gz && \
   cd .. && \
   echo "...vocabulary is uncompressed..." && \
   echo "--------------------" && \
-  
   echo "...Configuring and building ORB-SLAM3..." && \
   mkdir build && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ ##//ini adalah lokasi menginstall g2o di /usr/local
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
+    ##//ini adalah lokasi menginstall g2o di /usr/local
     .. && \
   make -j${NUM_THREADS} && \
   echo "...ORB-SLAM3 is built..." && \
