@@ -22,8 +22,8 @@ RUN set -x && \
     x11-xserver-utils \
     xauth \
     xorg \
-    mesa-utils \
-    libpython2.7-dev \
+    #mesa-utils \
+    python \
     unzip && \
   : “g2o dependencies” && \ 
   ## di bawah ini dependencies nya
@@ -72,7 +72,7 @@ ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
 
 #Eigen
-ARG EIGEN3_VERSION=3.3.8
+ARG EIGEN3_VERSION=3.1.0
 WORKDIR /tmp 
 #Dependencies seperti Eigein, OpenCV, dan Pangolin membuat working directory di /temporary
 RUN set -x && \
@@ -83,7 +83,8 @@ RUN set -x && \
   mkdir -p build && \
   cd build && \
   cmake \
-    -DCMAKE_BUILD_TYPE=Release \ ##to set the configuration type
+    -DCMAKE_BUILD_TYPE=Release \ 
+    ##to set the configuration type
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
     ##ini adalah lokasi menginstall Eigen di /usr/local
     .. && \
