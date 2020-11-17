@@ -7,6 +7,7 @@ ENV DEBCONF_NOWARNINGS yes
 RUN set -x && \
   apt-get update -y -qq && \
   apt-get upgrade -y -qq --no-install-recommends && \
+  add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" && \
   : “basic dependencies” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -qq \
@@ -22,9 +23,11 @@ RUN set -x && \
     x11-xserver-utils \
     xauth \
     xorg \
-    #mesa-utils \
     python \
-    unzip && \
+    unzip \
+    python3-pip \
+    python-pip \
+    && \
   : “g2o dependencies” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -qq \
@@ -46,7 +49,45 @@ RUN set -x && \
     libavformat-dev \
     libavutil-dev \
     libswscale-dev \
-    libavresample-dev && \
+    libavresample-dev \
+    checkinstall \
+    yasm \
+    gfortran \
+    software-properties-common \
+    libjasper1 \
+    libxine2-dev \
+    libv4l-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgtk2.0-dev \
+    libtbb-dev \
+    qt5-default \
+    libfaac-dev \
+    libmp3lame-dev \
+    libtheora-dev \
+    libvorbis-dev \
+    libxvidcore-dev \
+    libopencore-amrnb-dev \
+    libopencore-amrwb-dev \
+    x264 \
+    v4l-utils \
+    libprotobuf-dev \
+    protobuf-compiler \
+    libgphoto2-dev \
+    libeigen3-dev \
+    libhdf5-dev \
+    doxygen \
+    python3-testresources && \
+  pip install -y \
+    numpy \
+    pyopengl \
+    Pillow \
+    pybind11 && \
+  pip3 install -y \
+    numpy \
+    pyopengl \
+    Pillow \
+    pybind11 && \
   : “other dependencies” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -qq \
@@ -116,7 +157,7 @@ RUN set -x && \
     -DINSTALL_C_EXAMPLES=ON \
     -DINSTALL_PYTHON_EXAMPLES=ON \
     -DBUILD_EXAMPLES=ON \
-    -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-3.4.12/modules \
+    -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-${OPENCV_VERSION}/modules \
     -DOPENCV_GENERATE_PKGCONFIG=ON \
     -DENABLE_CXX11=ON \
     -DENABLE_FAST_MATH=ON \
