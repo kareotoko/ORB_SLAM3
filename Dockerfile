@@ -88,6 +88,21 @@ RUN set -x && \
     pyopengl \
     Pillow \
     pybind11 && \
+  : “Pangolin dependencies” && \ 
+  ## di bawah ini dependencies nya
+  apt-get install -y \
+    libusb-1.0 \
+    libavcodec-dev \
+    libavutil-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libavdevice-dev \
+    libdc1394-22-dev \
+    libraw1394-dev \
+    libjpeg-dev \
+    libpng12-dev \
+    libtiff5-dev \
+    libopenexr-dev && \
   : “other dependencies” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -qq \
@@ -174,14 +189,10 @@ ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv4
 
 
 #Pangolin
-ARG PANGOLIN_COMMIT=ad8b5f83222291c51b4800d5a5873b0e90a0cf81 
-##// sepertinya ini adalah versi pangolin yang berfungsi pada openvslam tetapi apakah juga berfungsi pada orb-slam3??
-WORKDIR /tmp
+WORKDIR /SLAM
 RUN set -x && \
-  git clone https://github.com/stevenlovegrove/Pangolin.git && \
-  cd Pangolin && \
-  git checkout ${PANGOLIN_COMMIT} && \
-  sed -i -e “193,198d” ./src/utils/file_utils.cpp && \
+  git clone https://github.com/ktossell/libuvc.git && \
+  cd libuvc && \
   mkdir -p build && \
   cd build && \
   cmake \
@@ -191,8 +202,17 @@ RUN set -x && \
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
-  cd /tmp && \
-  rm -rf *
+  git clone https://github.com/stevenlovegrove/Pangolin.git && \
+  cd Pangolin && \
+  mkdir -p build && \
+  cd build && \
+  cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
+    ##//ini adalah lokasi menginstall OpenCV di /usr/local
+    .. && \
+  make -j${NUM_THREADS} && \
+  make install && \
 ENV Pangolin_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
 
 
