@@ -72,8 +72,8 @@ ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
 
 #Eigen
-ARG EIGEN3_VERSION=3.1.0
-WORKDIR /tmp 
+ARG EIGEN3_VERSION=3.3.7
+WORKDIR /SLAM 
 #Dependencies seperti Eigein, OpenCV, dan Pangolin membuat working directory di /temporary
 RUN set -x && \
   wget -q https://gitlab.com/libeigen/eigen/-/archive/${EIGEN3_VERSION}/eigen-${EIGEN3_VERSION}.tar.bz2 && \
@@ -92,18 +92,18 @@ RUN set -x && \
   #default make -j1 tetapi bisa dipercepat di saat awal menginstall
   make install && \ 
   ##perintah untuk menginstall make
-  cd /tmp && \
-  rm -rf * 
-  ##// setelah berhasil membangun Eigen lalu folder temporary tersebut didelete
 ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake 
 ##//lokasi instalasi Eigen di /usr/local
 
 
 #OpenCV
-ARG OPENCV_VERSION=3.2.0
-WORKDIR /tmp
+ARG OPENCV_VERSION=3.4.12
+WORKDIR /SLAM 
 RUN set -x && \
-  wget -q https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip && \
+  wget -q https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip && \  
+  unzip -q ${OPENCV_VERSION}.zip && \
+  rm -rf ${OPENCV_VERSION}.zip && \
+  wget -q https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip && \
   unzip -q ${OPENCV_VERSION}.zip && \
   rm -rf ${OPENCV_VERSION}.zip && \
   cd opencv-${OPENCV_VERSION} && \
@@ -113,18 +113,21 @@ RUN set -x && \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
     ##//ini adalah lokasi menginstall OpenCV di /usr/local
+    -DINSTALL_C_EXAMPLES=ON \
+    -DINSTALL_PYTHON_EXAMPLES=ON \
+    -DBUILD_EXAMPLES=ON \
+    -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-3.4.12/modules \
+    -DOPENCV_GENERATE_PKGCONFIG=ON \
     -DENABLE_CXX11=ON \
     -DENABLE_FAST_MATH=ON \
+    -DWITH_QT=ON \
+    -DWITH_OPENGL=ON \
     -DWITH_EIGEN=ON \
     -DWITH_FFMPEG=ON \
     -DWITH_OPENMP=ON \
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
-  cd /tmp && \ 
-  ##//lokasi penyinpanan sementar file yang tidak ada hubungannya dengan Cmake didelete
-  rm -rf * 
-  ##// setelah berhasil membangun Eigen lalu folder temporary tersebut didelete
 ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv4 
 ##//lokasi instalasi Opencv di /usr/local
 
