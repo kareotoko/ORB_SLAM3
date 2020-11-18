@@ -5,12 +5,11 @@ ENV DEBIAN_FRONTEND noninteractive
 #install dependencies via apt
 ENV DEBCONF_NOWARNINGS yes
 RUN set -x && \
-  apt-get update -y -qq && \
-  apt-get upgrade -y -qq --no-install-recommends && \
-  add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" && \
+  apt-get update -y && \
+  apt-get upgrade -y && \  
   : “basic dependencies” && \ 
   ## di bawah ini dependencies nya
-  apt-get install -y -qq \
+  apt-get install -y \
     build-essential \
     pkg-config \
     cmake \
@@ -25,58 +24,65 @@ RUN set -x && \
     xorg \
     python \
     unzip \
+    sudo \
+    emacs \
     python3-pip \
     python-pip \
-    && \
-  : “g2o dependencies” && \ 
-  ## di bawah ini dependencies nya
-  apt-get install -y -qq \
-    libgoogle-glog-dev \
-    libatlas-base-dev \
-    libsuitesparse-dev \
-    libglew-dev && \
+    && \ 
+    ## then donwload, extract and copy ontent of eigen 3.3.7 to /usr/local/include/eigen
   : “OpenCV dependencies” && \ 
   ## di bawah ini dependencies nya
+  add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" && \
   apt-get install -y -qq \
-    libgtk-3-dev \
-    libjpeg-dev \
-    libpng++-dev \
-    libtiff-dev \
-    libopenexr-dev \
-    libwebp-dev \
-    ffmpeg \
-    libavcodec-dev \
-    libavformat-dev \
-    libavutil-dev \
-    libswscale-dev \
-    libavresample-dev \
+    software-properties-common \    
     checkinstall \
     yasm \
-    gfortran \
-    software-properties-common \
+    ##pre-request for image processing
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
     libjasper1 \
+    ## libjasper1 after adding repository from xenial
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
     libxine2-dev \
     libv4l-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    ## video I/O
     libgstreamer1.0-dev \
     libgstreamer-plugins-base1.0-dev \
-    libgtk2.0-dev \
     libtbb-dev \
     qt5-default \
     libfaac-dev \
     libmp3lame-dev \
     libtheora-dev \
     libvorbis-dev \
-    libxvidcore-dev \
     libopencore-amrnb-dev \
     libopencore-amrwb-dev \
+    libavresample-dev \
     x264 \
     v4l-utils \
+    ffmpeg \
+    ## GTK lib
+    libgtk-3-dev \
+    libgtk2.0-dev \
+    ## to optimize opencv function
+    libatlas-base-dev \
+    gfortran \
+    ## optional dependencies
     libprotobuf-dev \
     protobuf-compiler \
+    libgoogle-glog-dev \
+    libgflags-dev \
     libgphoto2-dev \
     libeigen3-dev \
     libhdf5-dev \
-    doxygen \
+    doxygen \   
+    ## python libraries
+    python3-dev \
+    python-dev \
     python3-testresources && \
   pip install -y \
     numpy \
@@ -88,6 +94,15 @@ RUN set -x && \
     pyopengl \
     Pillow \
     pybind11 && \
+  cd /usr/include/linux && \
+  ln -s -f ../libv4l1-videodev.h videodev.h && \
+  cd ~ && \
+  sudo -H pip3 install -U pip numpy && \
+  : “g2o dependencies” && \ 
+  ## di bawah ini dependencies nya
+  apt-get install -y -qq \
+    libsuitesparse-dev \
+    libglew-dev && \
   : “Pangolin dependencies” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y \
@@ -106,6 +121,9 @@ RUN set -x && \
   : “other dependencies” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -qq \
+    libssl-dev \
+    libgomp1-amd64-cross \
+    libomp-dev \
     libyaml-cpp-dev && \
   : “remove cache” && \
   apt-get autoremove -y -qq && \ 
@@ -135,20 +153,10 @@ RUN set -x && \
   wget -q https://gitlab.com/libeigen/eigen/-/archive/${EIGEN3_VERSION}/eigen-${EIGEN3_VERSION}.tar.bz2 && \
   tar xf eigen-${EIGEN3_VERSION}.tar.bz2 && \
   rm -rf eigen-${EIGEN3_VERSION}.tar.bz2 && \
-  cd eigen-${EIGEN3_VERSION} && \
-  mkdir -p build && \
-  cd build && \
-  cmake \
-    -DCMAKE_BUILD_TYPE=Release \ 
-    ##to set the configuration type
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
-    ##ini adalah lokasi menginstall Eigen di /usr/local
-    .. && \
-  make -j${NUM_THREADS} && \ 
-  #default make -j1 tetapi bisa dipercepat di saat awal menginstall
-  make install && \ 
-  ##perintah untuk menginstall make
-ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake 
+  cp eigen-${EIGEN3_VERSION} ${CMAKE_INSTALL_PREFIX}/include/eigen3 && \
+  cp eigen-${EIGEN3_VERSION} ${CMAKE_INSTALL_PREFIX}/share/eigen3 && \
+   
+ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
 ##//lokasi instalasi Eigen di /usr/local
 
 
@@ -156,13 +164,15 @@ ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake
 ARG OPENCV_VERSION=3.4.12
 WORKDIR /SLAM 
 RUN set -x && \
-  wget -q https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip && \  
-  unzip -q ${OPENCV_VERSION}.zip && \
-  rm -rf ${OPENCV_VERSION}.zip && \
-  wget -q https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip && \
-  unzip -q ${OPENCV_VERSION}.zip && \
-  rm -rf ${OPENCV_VERSION}.zip && \
-  cd opencv-${OPENCV_VERSION} && \
+  git clone https://github.com/opencv/opencv.git && \  
+  cd opencv && \
+  git checkout tags/${OPENCV_VERSION} && \
+  cd .. && \
+  git clone https://github.com/opencv/opencv_contrib.git && \
+  cd opencv_contrib && \
+  git checkout tags/${OPENCV_VERSION} && \
+  cd .. && \
+  cd opencv && \
   mkdir -p build && \
   cd build && \
   cmake \
@@ -171,20 +181,24 @@ RUN set -x && \
     ##//ini adalah lokasi menginstall OpenCV di /usr/local
     -DINSTALL_C_EXAMPLES=ON \
     -DINSTALL_PYTHON_EXAMPLES=ON \
-    -DBUILD_EXAMPLES=ON \
-    -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-${OPENCV_VERSION}/modules \
-    -DOPENCV_GENERATE_PKGCONFIG=ON \
-    -DENABLE_CXX11=ON \
-    -DENABLE_FAST_MATH=ON \
     -DWITH_QT=ON \
     -DWITH_OPENGL=ON \
     -DWITH_EIGEN=ON \
-    -DWITH_FFMPEG=ON \
+    -DWITH_TBB=ON \
+    -DWITH_AVFOUNDATION=ON \
     -DWITH_OPENMP=ON \
+    -DWITH_FFMPEG=ON \
+    -DWITH_GSTREAMER=ON \
+    -DENABLE_CXX11=ON \
+    -DENABLE_FAST_MATH=ON \
+    -DOPENCV_GENERATE_PKGCONFIG=ON \ 
+    -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+    -DOPENCV_PYTHON3_INSTALL_PATH=/usr/local/lib/python3.6/dist-packages \
+    -DBUILD_EXAMPLES=ON \
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
-ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv4 
+ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
 ##//lokasi instalasi Opencv di /usr/local
 
 
@@ -248,7 +262,7 @@ RUN set -x && \
   echo "...Uncompress vocabulary..." && \
   cd Vocabulary && \
   tar -xf ORBvoc.txt.tar.gz && \
-  cd .. && \
+  cd .. && \doc
   echo "...vocabulary is uncompressed..." && \
   echo "--------------------" && \
   echo "...Configuring and building ORB-SLAM3..." && \
