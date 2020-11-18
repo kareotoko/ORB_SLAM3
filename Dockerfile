@@ -102,6 +102,9 @@ RUN set -x && \
   ## di bawah ini dependencies nya
   apt-get install -y -qq \
     libsuitesparse-dev \
+    qtdeclarative5-dev \
+    qt5-qmake \
+    libqglviewer-dev-qt5 \
     libglew-dev && \
   : “Pangolin dependencies” && \ 
   ## di bawah ini dependencies nya
