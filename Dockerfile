@@ -1,7 +1,6 @@
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
 
-
 #install dependencies via apt
 ENV DEBCONF_NOWARNINGS yes
 RUN set -x && \
@@ -134,7 +133,6 @@ RUN set -x && \
   rm -rf /var/lib/apt/lists/*    
   ##menghapus file cache dependencies yang sudah tidak digunakan lagi
 
-
 ARG CMAKE_INSTALL_PREFIX=/usr/local
 ARG NUM_THREADS=1
 
@@ -147,7 +145,6 @@ ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 #ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 #ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-
 #Eigen
 ARG EIGEN3_VERSION=3.3.7
 WORKDIR /SLAM 
@@ -157,11 +154,9 @@ RUN set -x && \
   tar xf eigen-${EIGEN3_VERSION}.tar.bz2 && \
   rm -rf eigen-${EIGEN3_VERSION}.tar.bz2 && \
   cp eigen-${EIGEN3_VERSION} ${CMAKE_INSTALL_PREFIX}/include/eigen3 && \
-  cp eigen-${EIGEN3_VERSION} ${CMAKE_INSTALL_PREFIX}/share/eigen3 && \
-   
+  cp eigen-${EIGEN3_VERSION} ${CMAKE_INSTALL_PREFIX}/share/eigen3 && \   
 ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
 ##//lokasi instalasi Eigen di /usr/local
-
 
 #OpenCV
 ARG OPENCV_VERSION=3.4.12
@@ -204,7 +199,6 @@ RUN set -x && \
 ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
 ##//lokasi instalasi Opencv di /usr/local
 
-
 #Pangolin
 WORKDIR /SLAM
 RUN set -x && \
@@ -231,7 +225,6 @@ RUN set -x && \
   make -j${NUM_THREADS} && \
   make install && \
 ENV Pangolin_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
-
 
 #ORB-SLAM3 with DBoW2 and g2o
 COPY . /ORB-SLAM3/
@@ -281,6 +274,5 @@ RUN set -x && \
   echo "--------------------" && \
   rm -rf CMakeCache.txt CMakeFiles Makefile cmake_install.cmake example src && \
   chmod -R 777 ./*
-
 WORKDIR /ORB-SLAM3/build/
 ENTRYPOINT [“/bin/bash”]
