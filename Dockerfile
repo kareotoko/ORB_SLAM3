@@ -11,6 +11,9 @@ RUN set -x && \
   apt-get install -y \
     build-essential \
     pkg-config \
+    software-properties-common \
+    checkinstall \
+    yasm \
     cmake \
     git \
     wget \
@@ -21,26 +24,26 @@ RUN set -x && \
     x11-xserver-utils \
     xauth \
     xorg \
-    python \
     unzip \
     sudo \
     emacs \
-    python3-pip \
+    python \
+    python3 \
+    python-dev \
+    python3-dev \
+    python3-testresources \
     python-pip \
+    python3-pip \
     && \ 
-    ## then donwload, extract and copy ontent of eigen 3.3.7 to /usr/local/include/eigen
   : “OpenCV dependencies” && \ 
   ## di bawah ini dependencies nya
   add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" && \
-  apt-get install -y -qq \
-    software-properties-common \    
-    checkinstall \
-    yasm \
+  apt-get install -y -q \
     ##pre-request for image processing
     libjpeg-dev \
     libpng-dev \
     libtiff-dev \
-    libjasper1 \
+    libjasper-dev \
     ## libjasper1 after adding repository from xenial
     libavcodec-dev \
     libavformat-dev \
@@ -53,13 +56,12 @@ RUN set -x && \
     libgstreamer1.0-dev \
     libgstreamer-plugins-base1.0-dev \
     libtbb-dev \
-    qt5-default \
+    qt4-default \
     libfaac-dev \
     libmp3lame-dev \
     libtheora-dev \
     libvorbis-dev \
     libopencore-amrnb-dev \
-    libopencore-amrwb-dev \
     libavresample-dev \
     x264 \
     v4l-utils \
@@ -76,30 +78,27 @@ RUN set -x && \
     libgoogle-glog-dev \
     libgflags-dev \
     libgphoto2-dev \
-    libeigen3-dev \
     libhdf5-dev \
-    doxygen \   
-    ## python libraries
-    python3-dev \
-    python-dev \
-    python3-testresources && \
-  pip install -y \
+    doxygen \
+    && \   
+  pip install \
     numpy \
     pyopengl \
     Pillow \
-    pybind11 && \
-  pip3 install -y \
+    pybind11 \
+    && \
+  pip3 install \
     numpy \
     pyopengl \
     Pillow \
-    pybind11 && \
+    pybind11 \
+    && \
   cd /usr/include/linux && \
   ln -s -f ../libv4l1-videodev.h videodev.h && \
   cd ~ && \
-  sudo -H pip3 install -U pip numpy && \
   : “g2o dependencies” && \ 
   ## di bawah ini dependencies nya
-  apt-get install -y -qq \
+  apt-get install -y -q \
     libsuitesparse-dev \
     qtdeclarative5-dev \
     qt5-qmake \
@@ -107,31 +106,60 @@ RUN set -x && \
     libglew-dev && \
   : “Pangolin dependencies” && \ 
   ## di bawah ini dependencies nya
-  apt-get install -y \
-    libusb-1.0 \
-    libavcodec-dev \
+  apt-get install -y -q\
+    libusb-dev \
     libavutil-dev \
-    libavformat-dev \
     libswscale-dev \
     libavdevice-dev \
     libdc1394-22-dev \
     libraw1394-dev \
-    libjpeg-dev \
     libpng12-dev \
     libtiff5-dev \
-    libopenexr-dev && \
+    libopenexr-dev \
+    libssl-dev \
+    libgomp1 \
+    libomp-dev \
+    libyaml-cpp-dev \
+    && \
   : “other dependencies” && \ 
   ## di bawah ini dependencies nya
-  apt-get install -y -qq \
-    libssl-dev \
-    libgomp1-amd64-cross \
-    libomp-dev \
-    libyaml-cpp-dev && \
+  apt-get install -y -q \
+    libboost-filesystem-dev \
+    libopenblas-base \
+    liblapacke-dev \
+    flake8 \
+    pylint \
+    openmpi-common \
+    libiomp-dev \
+    libboost-all-dev \
+    libblas-dev \
+    liblapack-dev \
+    libfftw3-dev \
+    libegl1-mesa-dev \
+    libwayland-dev \
+    libxkbcommon-dev \
+    wayland-protocols \
+    libgl1-mesa-dev \
+    libglew-dev \
+    libmpfrc++-dev \
+    libadolc-dev \
+    libsparsehash-dev \
+    libsuperlu-dev \
+    pfsglview \
+    libscotch-dev \
+    libmetis-dev \
+    python-numpy \
+    freeglut3-dev \
+    lvtk-dev \
+    && \
   : “remove cache” && \
-  apt-get autoremove -y -qq && \ 
+  apt-get autoremove -y -q && \ 
   ##autoremove will remove those dependencies that were installed with applications and that are no longer used by anything else on the system | https://askubuntu.com/questions/527410/what-is-the-advantage-of-using-sudo-apt-get-autoremove-over-a-cleaner-app
   rm -rf /var/lib/apt/lists/*    
   ##menghapus file cache dependencies yang sudah tidak digunakan lagi
+  : “install gcc-6 and g++-6 versions” && \
+  apt-get install -y -q \
+    gcc
 
 ARG CMAKE_INSTALL_PREFIX=/usr/local
 ARG NUM_THREADS=1
@@ -146,20 +174,23 @@ ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 #ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 #Eigen
-ARG EIGEN3_VERSION=3.3.7
+ARG EIGEN3_VERSION=3.1.4
 WORKDIR /SLAM 
 #Dependencies seperti Eigein, OpenCV, dan Pangolin membuat working directory di /temporary
 RUN set -x && \
   wget -q https://gitlab.com/libeigen/eigen/-/archive/${EIGEN3_VERSION}/eigen-${EIGEN3_VERSION}.tar.bz2 && \
   tar xf eigen-${EIGEN3_VERSION}.tar.bz2 && \
   rm -rf eigen-${EIGEN3_VERSION}.tar.bz2 && \
-  cp eigen-${EIGEN3_VERSION} ${CMAKE_INSTALL_PREFIX}/include/eigen3 && \
-  cp eigen-${EIGEN3_VERSION} ${CMAKE_INSTALL_PREFIX}/share/eigen3 && \   
-ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
+  cd eigen-${EIGEN3_VERSION} && \
+  mkdir -p build && \
+  cd build && \
+  cmake .. && \
+  make install && \
+##ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
 ##//lokasi instalasi Eigen di /usr/local
 
 #OpenCV
-ARG OPENCV_VERSION=3.4.12
+ARG OPENCV_VERSION=3.2.0
 WORKDIR /SLAM 
 RUN set -x && \
   git clone https://github.com/opencv/opencv.git && \  
@@ -175,18 +206,19 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
-    ##//ini adalah lokasi menginstall OpenCV di /usr/local
     -DINSTALL_C_EXAMPLES=ON \
     -DINSTALL_PYTHON_EXAMPLES=ON \
-    -DWITH_QT=ON \
-    -DWITH_OPENGL=ON \
-    -DWITH_EIGEN=ON \
-    -DWITH_TBB=ON \
+    -DWITH_1394=ON \
     -DWITH_AVFOUNDATION=ON \
-    -DWITH_OPENMP=ON \
+    -DWITH_EIGEN=ON \
     -DWITH_FFMPEG=ON \
     -DWITH_GSTREAMER=ON \
+    -DWITH_OPENEXR=ON \
+    -DWITH_OPENMP=ON \
+    -DWITH_V4L=ON \
+    -DWITH_LIBV4L=OFF \
+    -DWITH_OPENCL=ON \
+    -DWITH_LAPACK=ON \
     -DENABLE_CXX11=ON \
     -DENABLE_FAST_MATH=ON \
     -DOPENCV_GENERATE_PKGCONFIG=ON \ 
@@ -196,7 +228,7 @@ RUN set -x && \
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
-ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
+##ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
 ##//lokasi instalasi Opencv di /usr/local
 
 #Pangolin
