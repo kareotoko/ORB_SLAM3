@@ -123,7 +123,7 @@ ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
--lboost_serialization # ??-lboost_serialization itu apa ya | ??pada ORB-SLAM2 itu tidak ada mengapa ya.
+-lboost_serialization # ??-lboost_serialization itu adalah library tambahan selain dari gcc dan g++ untuk mempercepat proses pengolahan data | ??pada ORB-SLAM2 itu tidak ada mengapa ya.
 -lcrypto # ??-lcrypto itu apa ya | ??pada ORB-SLAM2 itu tidak ada mengapa ya.
 )
 
