@@ -237,29 +237,37 @@ RUN set -x && \
 ENV OpenCV_LIBS=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
 ##//lokasi instalasi Opencv di /usr/local
 
-#Pangolin
-WORKDIR /SLAM
+#DLib
+#Digunakan sebagai dependencies dari DBoW2
+WORKDIR /SLAM 
 RUN set -x && \
-  git clone https://github.com/ktossell/libuvc.git && \
+  git clone https://github.com/dorian3d/DLib.git && \
+  cd DLib && \
+  mkdir -p build && \
+  cd build && \
+  cmake .. -DCMAKE_BUILD_TYPE=Release && \
+  make -j${NUM_THREADS} && \
+  make install && \
+
+#libuvc
+#Digunakan sebagai dependencies dari libuvc
+WORKDIR /SLAM 
+RUN set -x && \
+  git clone https://github.com/libuvc/libuvc.git && \
   cd libuvc && \
   mkdir -p build && \
   cd build && \
-  cmake \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
-    ##//ini adalah lokasi menginstall OpenCV di /usr/local
-    .. && \
-  make -j${NUM_THREADS} && \
-  make install && \
+  cmake .. && \
+  make && sudo make install && \
+
+#Pangolin
+WORKDIR /SLAM
+RUN set -x && \
   git clone https://github.com/stevenlovegrove/Pangolin.git && \
   cd Pangolin && \
   mkdir -p build && \
   cd build && \
-  cmake \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
-    ##//ini adalah lokasi menginstall OpenCV di /usr/local
-    .. && \
+  cmake -DCPP11_NO_BOOST=1 ..
   make -j${NUM_THREADS} && \
   make install && \
 ENV PANGOLIN_LIBS=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
@@ -275,8 +283,6 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
-    ##//ini adalah lokasi menginstall DBoW2 di /usr/local
     .. && \
   make -j${NUM_THREADS} && \
   echo "...DBoW2 is built..." && \
@@ -287,8 +293,6 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
-    ##//ini adalah lokasi menginstall g2o di /usr/local
     .. && \
   make -j${NUM_THREADS} && \
   echo "...g2o is built..." && \
@@ -305,8 +309,6 @@ RUN set -x && \
   cd build && \
   cmake \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \ 
-    ##//ini adalah lokasi menginstall g2o di /usr/local
     .. && \
   make -j${NUM_THREADS} && \
   echo "...ORB-SLAM3 is built..." && \
