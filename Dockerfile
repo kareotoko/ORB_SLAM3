@@ -121,7 +121,7 @@ RUN set -x && \
     libomp-dev \
     libyaml-cpp-dev \
     && \
-  : “other dependencies” && \ 
+  : “other dependencies for orb-slam3” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -q \
     libboost-filesystem-dev \
@@ -209,7 +209,6 @@ RUN set -x && \
     -DINSTALL_C_EXAMPLES=ON \
     -DINSTALL_PYTHON_EXAMPLES=ON \
     -DWITH_1394=ON \
-    -DWITH_AVFOUNDATION=ON \
     -DWITH_EIGEN=ON \
     -DWITH_FFMPEG=ON \
     -DWITH_GSTREAMER=ON \
@@ -218,7 +217,7 @@ RUN set -x && \
     -DWITH_V4L=ON \
     -DWITH_LIBV4L=OFF \
     -DWITH_OPENCL=ON \
-    -DWITH_LAPACK=ON \
+    -DWITH_LAPACK=OFF \
     -DENABLE_CXX11=ON \
     -DENABLE_FAST_MATH=ON \
     -DOPENCV_GENERATE_PKGCONFIG=ON \ 
