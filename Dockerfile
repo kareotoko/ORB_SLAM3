@@ -152,14 +152,19 @@ RUN set -x && \
     freeglut3-dev \
     lvtk-dev \
     && \
+  : “install gcc-6 and g++-6 versions” && \
+  apt-get install -y -q \
+    gcc-6 \
+    g++-6 \
+    && \
+  sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 6 && \
+  sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 6 && \
   : “remove cache” && \
   apt-get autoremove -y -q && \ 
   ##autoremove will remove those dependencies that were installed with applications and that are no longer used by anything else on the system | https://askubuntu.com/questions/527410/what-is-the-advantage-of-using-sudo-apt-get-autoremove-over-a-cleaner-app
   rm -rf /var/lib/apt/lists/*    
   ##menghapus file cache dependencies yang sudah tidak digunakan lagi
-  : “install gcc-6 and g++-6 versions” && \
-  apt-get install -y -q \
-    gcc
+  
 
 ARG CMAKE_INSTALL_PREFIX=/usr/local
 ARG NUM_THREADS=1
@@ -187,6 +192,7 @@ RUN set -x && \
   cmake .. && \
   make install && \
 ##ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
+ENV EIGEN3_LIBS=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
 ##//lokasi instalasi Eigen di /usr/local
 
 #OpenCV
@@ -228,6 +234,7 @@ RUN set -x && \
   make -j${NUM_THREADS} && \
   make install && \
 ##ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
+ENV OpenCV_LIBS=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
 ##//lokasi instalasi Opencv di /usr/local
 
 #Pangolin
@@ -255,7 +262,8 @@ RUN set -x && \
     .. && \
   make -j${NUM_THREADS} && \
   make install && \
-ENV Pangolin_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
+ENV PANGOLIN_LIBS=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
+##ENV Pangolin_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
 
 #ORB-SLAM3 with DBoW2 and g2o
 COPY . /ORB-SLAM3/
