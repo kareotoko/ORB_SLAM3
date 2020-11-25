@@ -1,14 +1,12 @@
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
 
-#install dependencies via apt
 ENV DEBCONF_NOWARNINGS yes
 RUN set -x && \
   apt-get update -y && \
   apt-get upgrade -y && \  
   : “basic dependencies” && \ 
-  ## di bawah ini dependencies nya
-  apt-get install -y \
+  apt-get install -y -q \
     build-essential \
     pkg-config \
     software-properties-common \
@@ -36,7 +34,6 @@ RUN set -x && \
     python3-pip \
     && \ 
   : “OpenCV dependencies” && \ 
-  ## di bawah ini dependencies nya
   add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main" && \
   apt-get install -y -q \
     ##pre-request for image processing
@@ -44,7 +41,7 @@ RUN set -x && \
     libpng-dev \
     libtiff-dev \
     libjasper-dev \
-    ## libjasper1 after adding repository from xenial
+    ## libjasper-dev after adding repository from xenial
     libavcodec-dev \
     libavformat-dev \
     libswscale-dev \
@@ -107,6 +104,7 @@ RUN set -x && \
   : “Pangolin dependencies” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -q\
+    libusb-1.0 \
     libusb-dev \
     libavutil-dev \
     libswscale-dev \
@@ -124,7 +122,6 @@ RUN set -x && \
   : “other dependencies for orb-slam3” && \ 
   ## di bawah ini dependencies nya
   apt-get install -y -q \
-    libboost-filesystem-dev \
     libopenblas-base \
     liblapacke-dev \
     flake8 \
@@ -132,6 +129,10 @@ RUN set -x && \
     openmpi-common \
     libiomp-dev \
     libboost-all-dev \
+    libboost-dev \
+    libboost-filesystem-dev \
+    libboost-system-dev \
+    libboost-thread-dev \
     libblas-dev \
     liblapack-dev \
     libfftw3-dev \
@@ -150,7 +151,8 @@ RUN set -x && \
     libmetis-dev \
     python-numpy \
     freeglut3-dev \
-    lvtk-dev \
+    libvtk6-dev \
+    libssl-dev \
     && \
   : “install gcc-6 and g++-6 versions” && \
   apt-get install -y -q \
@@ -169,18 +171,18 @@ RUN set -x && \
 ARG CMAKE_INSTALL_PREFIX=/usr/local
 ARG NUM_THREADS=1
 
-ENV CPATH=${CMAKE_INSTALL_PREFIX}/include:${CPATH}
-ENV C_INCLUDE_PATH=${CMAKE_INSTALL_PREFIX}/include:${C_INCLUDE_PATH}
-ENV CPLUS_INCLUDE_PATH=${CMAKE_INSTALL_PREFIX}/include:${CPLUS_INCLUDE_PATH}
-ENV LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LIBRARY_PATH}
-ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
+#ENV CPATH=${CMAKE_INSTALL_PREFIX}/include:${CPATH}
+#ENV C_INCLUDE_PATH=${CMAKE_INSTALL_PREFIX}/include:${C_INCLUDE_PATH}
+#ENV CPLUS_INCLUDE_PATH=${CMAKE_INSTALL_PREFIX}/include:${CPLUS_INCLUDE_PATH}
+#ENV LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LIBRARY_PATH}
+#ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${LD_LIBRARY_PATH}
 
 #ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 #ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
 #Eigen
 ARG EIGEN3_VERSION=3.1.4
-WORKDIR /SLAM 
+WORKDIR ~/SLAM 
 #Dependencies seperti Eigein, OpenCV, dan Pangolin membuat working directory di /temporary
 RUN set -x && \
   wget -q https://gitlab.com/libeigen/eigen/-/archive/${EIGEN3_VERSION}/eigen-${EIGEN3_VERSION}.tar.bz2 && \
@@ -192,12 +194,12 @@ RUN set -x && \
   cmake .. && \
   make install && \
 ##ENV Eigen3_DIR=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
-ENV EIGEN3_LIBS=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
+#ENV EIGEN3_LIBS=${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake \
 ##//lokasi instalasi Eigen di /usr/local
 
 #OpenCV
 ARG OPENCV_VERSION=3.2.0
-WORKDIR /SLAM 
+WORKDIR ~/SLAM 
 RUN set -x && \
   git clone https://github.com/opencv/opencv.git && \  
   cd opencv && \
@@ -214,18 +216,7 @@ RUN set -x && \
     -DCMAKE_BUILD_TYPE=Release \
     -DINSTALL_C_EXAMPLES=ON \
     -DINSTALL_PYTHON_EXAMPLES=ON \
-    -DWITH_1394=ON \
-    -DWITH_EIGEN=ON \
-    -DWITH_FFMPEG=ON \
-    -DWITH_GSTREAMER=ON \
-    -DWITH_OPENEXR=ON \
-    -DWITH_OPENMP=ON \
-    -DWITH_V4L=ON \
-    -DWITH_LIBV4L=OFF \
-    -DWITH_OPENCL=ON \
-    -DWITH_LAPACK=OFF \
-    -DENABLE_CXX11=ON \
-    -DENABLE_FAST_MATH=ON \
+    -DENABLE_PRECOMPILED_HEADERS=OFF \
     -DOPENCV_GENERATE_PKGCONFIG=ON \ 
     -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
     -DOPENCV_PYTHON3_INSTALL_PATH=/usr/local/lib/python3.6/dist-packages \
@@ -234,12 +225,12 @@ RUN set -x && \
   make -j${NUM_THREADS} && \
   make install && \
 ##ENV OpenCV_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
-ENV OpenCV_LIBS=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
+#ENV OpenCV_LIBS=${CMAKE_INSTALL_PREFIX}/lib/cmake/opencv3 
 ##//lokasi instalasi Opencv di /usr/local
 
 #DLib
 #Digunakan sebagai dependencies dari DBoW2
-WORKDIR /SLAM 
+WORKDIR ~/SLAM 
 RUN set -x && \
   git clone https://github.com/dorian3d/DLib.git && \
   cd DLib && \
@@ -251,7 +242,7 @@ RUN set -x && \
 
 #libuvc
 #Digunakan sebagai dependencies dari libuvc
-WORKDIR /SLAM 
+WORKDIR ~/SLAM 
 RUN set -x && \
   git clone https://github.com/libuvc/libuvc.git && \
   cd libuvc && \
@@ -261,7 +252,7 @@ RUN set -x && \
   make && sudo make install && \
 
 #Pangolin
-WORKDIR /SLAM
+WORKDIR ~/SLAM
 RUN set -x && \
   git clone https://github.com/stevenlovegrove/Pangolin.git && \
   cd Pangolin && \
@@ -274,8 +265,8 @@ ENV PANGOLIN_LIBS=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
 ##ENV Pangolin_DIR=${CMAKE_INSTALL_PREFIX}/lib/cmake/Pangolin
 
 #ORB-SLAM3 with DBoW2 and g2o
-COPY . /ORB-SLAM3/
-WORKDIR /ORB-SLAM3/
+COPY . ~/SLAM/ORB-SLAM3/
+WORKDIR ~/SLAM/ORB-SLAM3/
 RUN set -x && \
   cd Thirdparty/DBoW2 && \
   echo "Configuring and building Thirdparty/DBoW2 ..." && \
@@ -286,6 +277,7 @@ RUN set -x && \
     .. && \
   make -j${NUM_THREADS} && \
   echo "...DBoW2 is built..." && \
+  
   echo "--------------------" && \
   cd ../../g2o  && \
   echo "...Configuring and building Thirdparty/g2o..." && \
@@ -296,6 +288,7 @@ RUN set -x && \
     .. && \
   make -j${NUM_THREADS} && \
   echo "...g2o is built..." && \
+  
   echo "--------------------" && \
   cd ../../.. && \
   echo "...Uncompress vocabulary..." && \
@@ -303,6 +296,7 @@ RUN set -x && \
   tar -xf ORBvoc.txt.tar.gz && \
   cd .. && \doc
   echo "...vocabulary is uncompressed..." && \
+  
   echo "--------------------" && \
   echo "...Configuring and building ORB-SLAM3..." && \
   mkdir build && \
@@ -311,9 +305,10 @@ RUN set -x && \
     -DCMAKE_BUILD_TYPE=Release \
     .. && \
   make -j${NUM_THREADS} && \
+  make install && \
   echo "...ORB-SLAM3 is built..." && \
+  
   echo "--------------------" && \
-  rm -rf CMakeCache.txt CMakeFiles Makefile cmake_install.cmake example src && \
-  chmod -R 777 ./*
-WORKDIR /ORB-SLAM3/build/
+
+WORKDIR ~/SLAM/ORB-SLAM3/build/
 ENTRYPOINT [“/bin/bash”]
