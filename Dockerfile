@@ -186,7 +186,7 @@ WORKDIR ~/SLAM
 #Dependencies seperti Eigein, OpenCV, dan Pangolin membuat working directory di /temporary
 RUN set -x && \
   wget -q https://gitlab.com/libeigen/eigen/-/archive/${EIGEN3_VERSION}/eigen-${EIGEN3_VERSION}.tar.bz2 && \
-  tar xf eigen-${EIGEN3_VERSION}.tar.bz2 && \
+  tar -xf eigen-${EIGEN3_VERSION}.tar.bz2 && \
   rm -rf eigen-${EIGEN3_VERSION}.tar.bz2 && \
   cd eigen-${EIGEN3_VERSION} && \
   mkdir -p build && \
